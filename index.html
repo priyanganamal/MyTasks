@@ -3296,17 +3296,7 @@
       req.onsuccess = () => res(req.result ? req.result.blob : null);
       req.onerror   = () => rej(req.error);
     });
-    if (local) return local;
-    // Not local — try Firebase Storage
-    const url = await _fbGetFileUrl(id);
-    if (!url) return null;
-    try {
-      const blob = await fetch(url).then(r => r.blob());
-      // Cache locally for next access
-      const tx = db.transaction('f', 'readwrite');
-      tx.objectStore('f').put({ id, blob });
-      return blob;
-    } catch(e) { return null; }
+    return local; // local-only; display functions use _getDisplayUrl for Storage fallback
   }
 
   async function getAllDBFiles() {
