@@ -4256,13 +4256,39 @@
     }
   }
 
+  async function _fbSyncAllFiles() {
+    if (!_fb.storage) return;
+    // Collect every file ID referenced in current data
+    const ids = new Set();
+    for (const l of leads) {
+      if (l.cardFront?.id) ids.add(l.cardFront.id);
+      if (l.cardBack?.id)  ids.add(l.cardBack.id);
+    }
+    for (const f of followers) {
+      if (f.logoId) ids.add(f.logoId);
+    }
+    for (const t of [...tasks, ...simTasks]) {
+      for (const a of (t.attachments || [])) ids.add(a.id);
+      for (const e of (t.log || []))
+        for (const a of (e.attachments || [])) ids.add(a.id);
+    }
+    let uploaded = 0;
+    for (const id of ids) {
+      const blob = await getFile(id);
+      if (blob) { await _fbUploadFile(id, blob); uploaded++; }
+    }
+    return uploaded;
+  }
+
   async function fbSyncNow() {
     if (!_fb.db) { setSyncStatus('Not connected to Firebase.', 'err'); return; }
     const btn = document.getElementById('fb-sync-now-btn');
     btn.disabled = true; btn.textContent = 'Syncing…';
     try {
       await _fbPushNow();
-      setSyncStatus('Synced!', 'ok');
+      btn.textContent = 'Uploading files…';
+      const n = await _fbSyncAllFiles();
+      setSyncStatus('Synced!' + (n ? ` (${n} file${n>1?'s':''} uploaded)` : ''), 'ok');
     } catch(e) {
       setSyncStatus('Sync failed: ' + e.message, 'err');
     } finally {
