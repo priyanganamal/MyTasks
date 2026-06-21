@@ -4175,8 +4175,10 @@
       err => setSyncStatus('Firestore error: ' + err.message, 'err')
     );
 
-    // Push local data in background — don't block connection on this
-    _fbPushNow().catch(e => setSyncStatus('Sync error: ' + e.message + ' — check Firestore is enabled in test mode.', 'err'));
+    // Only push on connect if we actually have local data — avoid overwriting Firestore with empty arrays
+    if (tasks.length || simTasks.length || followers.length || leads.length) {
+      _fbPushNow().catch(e => setSyncStatus('Sync error: ' + e.message + ' — check Firestore is enabled in test mode.', 'err'));
+    }
   }
 
   async function _fbPushNow() {
