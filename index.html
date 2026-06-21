@@ -3141,12 +3141,10 @@
     for (const img of imgs) {
       const logoId = img.dataset.logoId;
       if (_followerLogoURLs.has(logoId)) { img.src = _followerLogoURLs.get(logoId); continue; }
-      const blob = await getFile(logoId);
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        _followerLogoURLs.set(logoId, url);
-        img.src = url;
-      }
+      const url = await _getDisplayUrl(logoId);
+      if (!url) continue;
+      _followerLogoURLs.set(logoId, url);
+      img.src = url;
     }
   }
 
@@ -3263,6 +3261,22 @@
       req.onsuccess = e => { _db = e.target.result; res(_db); };
       req.onerror   = () => rej(req.error);
     });
+  }
+
+  async function _getLocalBlob(id) {
+    const db = await getDB();
+    return new Promise(res => {
+      const req = db.transaction('f').objectStore('f').get(id);
+      req.onsuccess = () => res(req.result?.blob || null);
+      req.onerror   = () => res(null);
+    });
+  }
+
+  // Returns a displayable URL: object URL if blob is local, Storage URL otherwise
+  async function _getDisplayUrl(id) {
+    const blob = await _getLocalBlob(id);
+    if (blob) return URL.createObjectURL(blob);
+    return _fbGetFileUrl(id); // direct Storage URL — no fetch() needed for <img src>
   }
 
   async function storeFile(id, blob) {
@@ -3782,9 +3796,8 @@
     for (const img of imgs) {
       const id = img.dataset.leadCardId;
       if (_leadCardURLs.has(id)) { img.src = _leadCardURLs.get(id); continue; }
-      const blob = await getFile(id);
-      if (!blob) continue;
-      const url = URL.createObjectURL(blob);
+      const url = await _getDisplayUrl(id);
+      if (!url) continue;
       _leadCardURLs.set(id, url);
       img.src = url;
     }
@@ -4274,7 +4287,7 @@
     }
     let uploaded = 0;
     for (const id of ids) {
-      const blob = await getFile(id);
+      const blob = await _getLocalBlob(id); // local only — no CORS fetch
       if (blob) { await _fbUploadFile(id, blob); uploaded++; }
     }
     return uploaded;
@@ -4569,11 +4582,10 @@
   async function previewFile(id, name, type) {
     _previewId   = id;
     _previewName = name;
-    const blob = await getFile(id);
-    if (!blob) { alert('File not found.'); return; }
-
+    const blob = await _getLocalBlob(id);
     if (_previewObjUrl) URL.revokeObjectURL(_previewObjUrl);
-    _previewObjUrl = URL.createObjectURL(blob);
+    _previewObjUrl = blob ? URL.createObjectURL(blob) : await _fbGetFileUrl(id);
+    if (!_previewObjUrl) { alert('File not found.'); return; }
 
     document.getElementById('preview-fname').textContent = name;
     document.getElementById('preview-dl').onclick = () => downloadFile(id, name);
