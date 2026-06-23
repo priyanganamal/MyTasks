@@ -2716,6 +2716,9 @@
         <div class="leads-add-row3">
           <select id="lead-source" class="lead-status-select" style="flex:1"></select>
         </div>
+        <div class="leads-add-row3">
+          <textarea id="lead-quick-note" class="lead-field-input" placeholder="Quick note — how you met, what they need…" maxlength="500" rows="2" style="resize:vertical;width:100%;box-sizing:border-box;font-family:inherit;font-size:inherit"></textarea>
+        </div>
         <div class="lead-card-upload-row">
           <div class="lead-card-slot" id="new-card-front-slot">
             <button class="lead-card-upload-btn" onclick="pickLeadCard('new','front')" type="button">
@@ -3362,6 +3365,15 @@
   function addLead() {
     const name = document.getElementById('lead-name').value.trim();
     if (!name) { document.getElementById('lead-name').focus(); return; }
+    const quickNote = document.getElementById('lead-quick-note').value.trim();
+    const followUps = quickNote ? [{
+      id: 'fu' + Date.now() + Math.random().toString(36).slice(2,6),
+      date: new Date().toISOString().slice(0,10),
+      status: 'new',
+      notes: quickNote,
+      nextFollowUp: null,
+      createdAt: new Date().toISOString(),
+    }] : [];
     const lead = {
       id:        'ld' + Date.now() + Math.random().toString(36).slice(2,6),
       name,
@@ -3371,15 +3383,16 @@
       source:    document.getElementById('lead-source').value.trim()  || null,
       cardFront: _pendingCardFront || null,
       cardBack:  _pendingCardBack  || null,
-      followUps: [],
+      followUps,
       createdAt: new Date().toISOString(),
     };
     leads.unshift(lead);
     saveLeads();
-    document.getElementById('lead-name').value    = '';
-    document.getElementById('lead-contact').value = '';
-    document.getElementById('lead-phone').value   = '';
-    document.getElementById('lead-email').value   = '';
+    document.getElementById('lead-name').value       = '';
+    document.getElementById('lead-contact').value    = '';
+    document.getElementById('lead-phone').value      = '';
+    document.getElementById('lead-email').value      = '';
+    document.getElementById('lead-quick-note').value = '';
     document.getElementById('lead-source').selectedIndex = 0;
     _pendingCardFront = null;
     _pendingCardBack  = null;
