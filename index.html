@@ -247,16 +247,6 @@
       text-decoration: underline; padding: 0;
     }
     .fb-disconnect-btn:hover { color: var(--danger); }
-    .sync-divider {
-      font-size: 0.65rem; font-weight: 600; color: var(--muted); text-align: center;
-      margin: 0.9rem 0; text-transform: uppercase; letter-spacing: 0.06em;
-      position: relative;
-    }
-    .sync-divider::before, .sync-divider::after {
-      content: ''; position: absolute; top: 50%;
-      width: calc(50% - 52px); height: 1px; background: var(--border);
-    }
-    .sync-divider::before { left: 0; } .sync-divider::after { right: 0; }
     .dark .fb-config-input { background: var(--card); color: var(--text); }
 
     .sync-modal-box { min-width: 280px; max-width: 360px; }
@@ -265,34 +255,12 @@
       margin-bottom: 1.25rem;
     }
     .sync-modal-title { font-size: 1rem; font-weight: 700; color: var(--text); }
-    .sync-options { display: flex; flex-direction: column; gap: 0.65rem; }
-    .sync-opt-btn {
-      display: flex; align-items: center; gap: 0.85rem;
-      padding: 0.85rem 1rem; border-radius: 10px;
-      border: 1.5px solid var(--border); background: var(--bg);
-      cursor: pointer; text-align: left; width: 100%;
-      font-family: inherit; transition: border-color 0.15s, background 0.15s;
-    }
-    .sync-opt-btn:hover { border-color: var(--blue); background: var(--card); }
-    .sync-opt-icon {
-      width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .sync-opt-icon.export { background: #dbeafe; color: #1d4ed8; }
-    .sync-opt-icon.import { background: #dcfce7; color: #15803d; }
-    .sync-opt-text { display: flex; flex-direction: column; gap: 0.1rem; }
-    .sync-opt-label { font-size: 0.88rem; font-weight: 700; color: var(--text); }
-    .sync-opt-desc  { font-size: 0.72rem; color: var(--muted); }
     .sync-status {
       margin-top: 1rem; font-size: 0.8rem; text-align: center;
       color: var(--muted); min-height: 1.2em;
     }
     .sync-status.ok  { color: #15803d; }
     .sync-status.err { color: var(--danger); }
-    .dark .sync-opt-btn { background: var(--bg); }
-    .dark .sync-opt-btn:hover { background: var(--card); }
-    .dark .sync-opt-icon.export { background: #1e3a5f; color: #60a5fa; }
-    .dark .sync-opt-icon.import { background: #14532d; color: #4ade80; }
 
     .cat-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
@@ -2865,30 +2833,7 @@
       </div>
     </div>
 
-    <div class="sync-divider">Manual backup</div>
-
-    <div class="sync-options">
-      <button class="sync-opt-btn" onclick="exportData()">
-        <span class="sync-opt-icon export">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-        </span>
-        <span class="sync-opt-text">
-          <span class="sync-opt-label">Export backup</span>
-          <span class="sync-opt-desc">Save all data to a file — share via AirDrop or Files</span>
-        </span>
-      </button>
-      <button class="sync-opt-btn" onclick="document.getElementById('import-file').click()">
-        <span class="sync-opt-icon import">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </span>
-        <span class="sync-opt-text">
-          <span class="sync-opt-label">Import backup</span>
-          <span class="sync-opt-desc">Restore from a saved file — replaces all current data</span>
-        </span>
-      </button>
-    </div>
     <div class="sync-status" id="sync-status"></div>
-    <input type="file" id="import-file" accept=".json" hidden onchange="importData(this)">
   </div>
 </div>
 
@@ -3375,40 +3320,6 @@
       req.onerror   = () => rej(req.error);
     });
     return local; // local-only; display functions use _getDisplayUrl for Storage fallback
-  }
-
-  async function getAllDBFiles() {
-    const db = await getDB();
-    return new Promise((res, rej) => {
-      const req = db.transaction('f').objectStore('f').getAll();
-      req.onsuccess = () => res(req.result || []);
-      req.onerror   = () => rej(req.error);
-    });
-  }
-
-  async function clearAllDBFiles() {
-    const db = await getDB();
-    return new Promise((res, rej) => {
-      const tx = db.transaction('f', 'readwrite');
-      tx.objectStore('f').clear();
-      tx.oncomplete = res; tx.onerror = () => rej(tx.error);
-    });
-  }
-
-  function blobToBase64(blob) {
-    return new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload  = () => res(r.result.split(',')[1]);
-      r.onerror = rej;
-      r.readAsDataURL(blob);
-    });
-  }
-
-  function base64ToBlob(b64, type) {
-    const bytes = atob(b64);
-    const arr = new Uint8Array(bytes.length);
-    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-    return new Blob([arr], { type: type || 'application/octet-stream' });
   }
 
   // ── Leads Tab ────────────────────────────────
@@ -4621,70 +4532,6 @@
     if (!el) return;
     el.textContent = msg;
     el.className = 'sync-status' + (type ? ' ' + type : '');
-  }
-
-  async function exportData() {
-    setSyncStatus('Preparing export…');
-    try {
-      const filesRaw = await getAllDBFiles();
-      const files = await Promise.all(filesRaw.map(async f => ({
-        id:   f.id,
-        type: f.blob.type,
-        data: await blobToBase64(f.blob)
-      })));
-      const payload = JSON.stringify({
-        app:       'parallax-task-tracker',
-        version:   1,
-        exportedAt: new Date().toISOString(),
-        tasks, simTasks, followers, leads, opportunities,
-        files
-      });
-      const fileName = 'my-tasks-' + new Date().toISOString().slice(0, 10) + '.json';
-      const blob = new Blob([payload], { type: 'application/json' });
-      const file = new File([blob], fileName, { type: 'application/json' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'My Tasks Backup' });
-        setSyncStatus('Shared successfully.', 'ok');
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = fileName; a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-        setSyncStatus('File downloaded.', 'ok');
-      }
-    } catch (e) {
-      if (e.name !== 'AbortError') setSyncStatus('Export failed: ' + e.message, 'err');
-      else setSyncStatus('');
-    }
-  }
-
-  async function importData(input) {
-    const file = input.files[0];
-    if (!file) return;
-    input.value = '';
-    setSyncStatus('Importing…');
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      if (data.app !== 'parallax-task-tracker') {
-        setSyncStatus('Not a valid backup file.', 'err'); return;
-      }
-      tasks         = data.tasks         || [];
-      simTasks      = data.simTasks      || [];
-      followers     = data.followers     || [];
-      leads         = data.leads         || [];
-      opportunities = data.opportunities || [];
-      await clearAllDBFiles();
-      for (const f of (data.files || [])) {
-        await storeFile(f.id, base64ToBlob(f.data, f.type));
-      }
-      await _fbPushNow();
-      await _fbSyncAllFiles();
-      setSyncStatus('Import complete — data saved to Firebase.', 'ok');
-      render();
-    } catch (e) {
-      setSyncStatus('Import failed: ' + e.message, 'err');
-    }
   }
 
   async function deleteFiles(ids) {
