@@ -178,6 +178,11 @@
     .fb-dot.off { background: var(--border); }
     .fb-dot.connecting { background: #f59e0b; animation: fb-pulse 1s ease-in-out infinite; }
     @keyframes fb-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+    .fb-pill { display:flex; align-items:center; gap:0.3rem; font-size:0.68rem; font-weight:700; padding:0.22rem 0.6rem; border-radius:100px; border:1.5px solid; cursor:pointer; transition:all 0.3s; letter-spacing:0.02em; user-select:none; }
+    .fb-pill.online      { background:rgba(34,197,94,0.18);  color:#22c55e; border-color:rgba(34,197,94,0.35); }
+    .fb-pill.connecting  { background:rgba(245,158,11,0.18); color:#f59e0b; border-color:rgba(245,158,11,0.35); animation:fb-pulse 1.2s ease-in-out infinite; }
+    .fb-pill.offline     { background:rgba(239,68,68,0.18);  color:#ef4444; border-color:rgba(239,68,68,0.35); }
+    .fb-pill-dot { width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
     .fb-status-label { font-size: 0.82rem; font-weight: 600; color: var(--text); flex: 1; }
     .fb-config-input {
       width: 100%; box-sizing: border-box; margin-top: 0.75rem;
@@ -2548,6 +2553,10 @@
         <div class="header-date" id="header-date"></div>
       </div>
       <div class="header-actions">
+        <div class="fb-pill offline" id="fb-pill" onclick="showSyncModal()" title="Firebase connection status">
+          <span class="fb-pill-dot"></span>
+          <span id="fb-pill-label">Offline</span>
+        </div>
         <button class="sync-btn" onclick="showSyncModal()" aria-label="Sync data" title="Export / Import data">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         </button>
@@ -4540,21 +4549,26 @@
     const discBtn    = document.getElementById('fb-disconnect-btn');
     const syncNowBtn = document.getElementById('fb-sync-now-btn');
     const input      = document.getElementById('fb-config-input');
-    if (!dot) return;
+    const pill       = document.getElementById('fb-pill');
+    const pillLabel  = document.getElementById('fb-pill-label');
     if (connected) {
-      dot.className = 'fb-dot on';
-      label.textContent = 'Connected — syncing in real time';
-      btn.hidden        = true;
-      input.hidden      = true;
-      discBtn.hidden    = false;
-      syncNowBtn.hidden = false;
+      if (dot)       { dot.className = 'fb-dot on'; }
+      if (label)     { label.textContent = 'Connected — syncing in real time'; }
+      if (btn)       { btn.hidden = true; }
+      if (input)     { input.hidden = true; }
+      if (discBtn)   { discBtn.hidden = false; }
+      if (syncNowBtn){ syncNowBtn.hidden = false; }
+      if (pill)      { pill.className = 'fb-pill online'; }
+      if (pillLabel) { pillLabel.textContent = 'Online'; }
     } else {
-      dot.className = 'fb-dot off';
-      label.textContent = 'Not connected';
-      btn.hidden   = false; btn.disabled = false; btn.textContent = 'Connect Firebase';
-      input.hidden = false;
-      discBtn.hidden    = true;
-      syncNowBtn.hidden = true;
+      if (dot)       { dot.className = 'fb-dot off'; }
+      if (label)     { label.textContent = 'Not connected'; }
+      if (btn)       { btn.hidden = false; btn.disabled = false; btn.textContent = 'Connect Firebase'; }
+      if (input)     { input.hidden = false; }
+      if (discBtn)   { discBtn.hidden = true; }
+      if (syncNowBtn){ syncNowBtn.hidden = true; }
+      if (pill)      { pill.className = 'fb-pill offline'; }
+      if (pillLabel) { pillLabel.textContent = 'Offline'; }
     }
   }
 
@@ -7471,6 +7485,10 @@
         if (_lbl) _lbl.textContent = 'Connecting…';
         if (_inp) _inp.hidden = true;
         if (_btn) _btn.hidden = true;
+        const _pill = document.getElementById('fb-pill');
+        const _pillLbl = document.getElementById('fb-pill-label');
+        if (_pill) _pill.className = 'fb-pill connecting';
+        if (_pillLbl) _pillLbl.textContent = 'Connecting…';
         initFirebase(_parsedCfg)
           .then(() => _updateFbUI(true))
           .catch(e => {
