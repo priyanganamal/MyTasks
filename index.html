@@ -2979,41 +2979,20 @@
   let followers = [];
   let pendingFollowerLogo = null; // { id: string } while composing a new follower
 
-  // ── Persistence ────────────────────────────
+  // ── Persistence — Firebase is the only store ──
+  // All save functions write to in-memory state then push to Firestore.
+  // Load functions are no-ops; data arrives via onSnapshot on connect.
 
-  function load() {
-    try { tasks = JSON.parse(localStorage.getItem('tt_v1') || '[]'); }
-    catch { tasks = []; }
-  }
-
-  function save() {
-    localStorage.setItem('tt_v1', JSON.stringify(tasks));
-    _fbSchedulePush();
-  }
-
-  function saveOpportunities() { localStorage.setItem('tt_opps_v1', JSON.stringify(opportunities)); _fbSchedulePush(); }
-  function loadOpportunities() {
-    try { opportunities = JSON.parse(localStorage.getItem('tt_opps_v1') || '[]'); }
-    catch { opportunities = []; }
-  }
-
-  function saveSimTasks() { localStorage.setItem('tt_tasks_v1', JSON.stringify(simTasks)); _fbSchedulePush(); }
-  function loadSimTasks() {
-    try { simTasks = JSON.parse(localStorage.getItem('tt_tasks_v1') || '[]'); }
-    catch { simTasks = []; }
-  }
-
-  function saveFollowers() { localStorage.setItem('tt_followers_v1', JSON.stringify(followers)); _fbSchedulePush(); }
-  function loadFollowers() {
-    try { followers = JSON.parse(localStorage.getItem('tt_followers_v1') || '[]'); }
-    catch { followers = []; }
-  }
-
-  function saveLeads() { localStorage.setItem('tt_leads_v1', JSON.stringify(leads)); _fbSchedulePush(); }
-  function loadLeads() {
-    try { leads = JSON.parse(localStorage.getItem('tt_leads_v1') || '[]'); }
-    catch { leads = []; }
-  }
+  function load()              { /* data comes from Firebase onSnapshot */ }
+  function save()              { _fbSchedulePush(); }
+  function saveOpportunities() { _fbSchedulePush(); }
+  function loadOpportunities() { /* data comes from Firebase onSnapshot */ }
+  function saveSimTasks()      { _fbSchedulePush(); }
+  function loadSimTasks()      { /* data comes from Firebase onSnapshot */ }
+  function saveFollowers()     { _fbSchedulePush(); }
+  function loadFollowers()     { /* data comes from Firebase onSnapshot */ }
+  function saveLeads()         { _fbSchedulePush(); }
+  function loadLeads()         { /* data comes from Firebase onSnapshot */ }
 
   // ── Followers Tab ────────────────────────────
 
@@ -4421,21 +4400,13 @@
         followers     = remote.followers     || [];
         leads         = remote.leads         || [];
         opportunities = remote.opportunities || [];
-        localStorage.setItem('tt_v1',           JSON.stringify(tasks));
-        localStorage.setItem('tt_tasks_v1',     JSON.stringify(simTasks));
-        localStorage.setItem('tt_followers_v1', JSON.stringify(followers));
-        localStorage.setItem('tt_leads_v1',     JSON.stringify(leads));
-        localStorage.setItem('tt_opps_v1',      JSON.stringify(opportunities));
         _fbSyncing = false;
         render();
       },
       err => setSyncStatus('Firestore error: ' + err.message, 'err')
     );
 
-    // Only push on connect if we actually have local data — avoid overwriting Firestore with empty arrays
-    if (tasks.length || simTasks.length || followers.length || leads.length || opportunities.length) {
-      _fbPushNow().catch(e => setSyncStatus('Sync error: ' + e.message + ' — check Firestore is enabled in test mode.', 'err'));
-    }
+    // Do not auto-push on connect — Firestore is the source of truth; data arrives via onSnapshot
   }
 
   async function _fbPushNow() {
@@ -4614,10 +4585,7 @@
         app:       'parallax-task-tracker',
         version:   1,
         exportedAt: new Date().toISOString(),
-        tasks:     JSON.parse(localStorage.getItem('tt_v1')          || '[]'),
-        simTasks:  JSON.parse(localStorage.getItem('tt_tasks_v1')    || '[]'),
-        followers: JSON.parse(localStorage.getItem('tt_followers_v1')|| '[]'),
-        leads:     JSON.parse(localStorage.getItem('tt_leads_v1')    || '[]'),
+        tasks, simTasks, followers, leads, opportunities,
         files
       });
       const fileName = 'my-tasks-' + new Date().toISOString().slice(0, 10) + '.json';
@@ -4650,16 +4618,19 @@
       if (data.app !== 'parallax-task-tracker') {
         setSyncStatus('Not a valid backup file.', 'err'); return;
       }
-      localStorage.setItem('tt_v1',           JSON.stringify(data.tasks     || []));
-      localStorage.setItem('tt_tasks_v1',     JSON.stringify(data.simTasks  || []));
-      localStorage.setItem('tt_followers_v1', JSON.stringify(data.followers || []));
-      localStorage.setItem('tt_leads_v1',     JSON.stringify(data.leads     || []));
+      tasks         = data.tasks         || [];
+      simTasks      = data.simTasks      || [];
+      followers     = data.followers     || [];
+      leads         = data.leads         || [];
+      opportunities = data.opportunities || [];
       await clearAllDBFiles();
       for (const f of (data.files || [])) {
         await storeFile(f.id, base64ToBlob(f.data, f.type));
       }
-      setSyncStatus('Import complete — reloading…', 'ok');
-      setTimeout(() => location.reload(), 900);
+      await _fbPushNow();
+      await _fbSyncAllFiles();
+      setSyncStatus('Import complete — data saved to Firebase.', 'ok');
+      render();
     } catch (e) {
       setSyncStatus('Import failed: ' + e.message, 'err');
     }
@@ -7518,6 +7489,11 @@
     renderSimCatRow();
     renderSimNewDateRow();
     renderEventAddMeta();
+
+    // Flush any pending debounced push before the tab closes
+    window.addEventListener('beforeunload', () => {
+      if (_fbPushTimer) { clearTimeout(_fbPushTimer); _fbPushNow(); }
+    });
   }
 
   init();
