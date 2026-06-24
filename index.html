@@ -2449,6 +2449,44 @@
     .lead-inline-fields { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 0.3rem; }
     .lead-inline-fields .lead-field-input { flex: 1 1 120px; min-width: 0; }
     .lead-inline-fields .lead-status-select { flex: 1 1 140px; min-width: 0; }
+
+    /* ── Opportunities tab ──────────────────────── */
+    .opp-add-bar { display:flex; gap:0.5rem; margin-bottom:1rem; align-items:center; }
+    .opp-empty { color:var(--muted); font-size:0.85rem; text-align:center; padding:2.5rem 1rem; }
+    .opp-card { background:var(--card); border:1px solid var(--border); border-radius:12px; margin-bottom:0.75rem; overflow:hidden; }
+    .opp-header { display:flex; align-items:center; gap:0.6rem; padding:0.7rem 0.9rem; cursor:pointer; user-select:none; }
+    .opp-header:hover { background:var(--hover); }
+    .opp-header-left { display:flex; align-items:center; gap:0.5rem; flex:1; min-width:0; }
+    .opp-header-right { display:flex; align-items:center; gap:0.45rem; flex-shrink:0; }
+    .opp-title-input { background:transparent; border:none; border-bottom:1.5px solid transparent; padding:0.1rem 0.2rem; font-size:0.95rem; font-weight:600; color:var(--text); font-family:inherit; flex:1; min-width:0; transition:border-color 0.15s; border-radius:0; }
+    .opp-title-input:hover { border-bottom-color:var(--border); }
+    .opp-title-input:focus { outline:none; border-bottom-color:var(--accent); background:var(--card); }
+    .opp-status-select,.task-status-select,.subtask-status-select { font-size:0.7rem; font-weight:600; border-radius:20px; border:1.5px solid; padding:0.18rem 0.5rem; cursor:pointer; font-family:inherit; flex-shrink:0; appearance:none; -webkit-appearance:none; text-align:center; }
+    .opp-progress-wrap { display:flex; align-items:center; gap:0.35rem; }
+    .opp-progress-bar { width:52px; height:5px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .opp-progress-fill { height:100%; background:var(--accent); border-radius:3px; }
+    .opp-progress-text { font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .opp-icon-btn { background:none; border:none; color:var(--muted); font-size:0.95rem; cursor:pointer; padding:0 0.15rem; line-height:1; }
+    .opp-icon-btn:hover { color:#ef4444; }
+    .opp-chevron { font-size:0.7rem; color:var(--muted); }
+    .opp-body { border-top:1px solid var(--border); padding:0.6rem 0.85rem 0.75rem; }
+    .opp-add-task-row,.opp-add-subtask-row { display:flex; gap:0.4rem; margin-top:0.5rem; align-items:center; }
+    .opp-add-task-row .add-btn,.opp-add-subtask-row .add-btn { padding:0.3rem 0.65rem; font-size:0.8rem; flex-shrink:0; }
+    .opp-task-item { margin-top:0.45rem; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--bg); }
+    .opp-task-header { display:flex; align-items:center; gap:0.5rem; padding:0.45rem 0.65rem; cursor:pointer; }
+    .opp-task-header:hover { background:var(--hover); }
+    .opp-task-header-left { display:flex; align-items:center; gap:0.4rem; flex:1; min-width:0; }
+    .opp-task-header-right { display:flex; align-items:center; gap:0.35rem; flex-shrink:0; }
+    .task-title-input { background:transparent; border:none; border-bottom:1.5px solid transparent; padding:0.08rem 0.15rem; font-size:0.875rem; color:var(--text); font-family:inherit; flex:1; min-width:0; border-radius:0; }
+    .task-title-input:hover { border-bottom-color:var(--border); }
+    .task-title-input:focus { outline:none; border-bottom-color:var(--accent); }
+    .task-sub-count { font-size:0.67rem; color:var(--muted); white-space:nowrap; }
+    .task-subtask-list { border-top:1px solid var(--border); padding:0.4rem 0.65rem 0.5rem; background:var(--card); }
+    .opp-subtask-item { display:flex; align-items:center; gap:0.4rem; padding:0.28rem 0; border-bottom:1px solid var(--border); }
+    .opp-subtask-item:last-child { border-bottom:none; }
+    .subtask-title-input { background:transparent; border:none; border-bottom:1.5px solid transparent; padding:0.06rem 0.1rem; font-size:0.82rem; color:var(--text); font-family:inherit; flex:1; min-width:0; border-radius:0; }
+    .subtask-title-input:hover { border-bottom-color:var(--border); }
+    .subtask-title-input:focus { outline:none; border-bottom-color:var(--accent); }
     .lead-card-notes { font-size: 0.8rem; color: var(--muted); margin-top: 0.3rem; white-space: pre-wrap; word-break: break-word; }
     .lead-card-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
     .lead-action-btn { font-size: 0.72rem; border: 1px solid var(--border); background: var(--bg); color: var(--muted); border-radius: 6px; padding: 0.22rem 0.65rem; cursor: pointer; }
@@ -2533,7 +2571,7 @@
     </div>
     <nav class="tab-bar" id="tab-bar">
       <button class="tab-btn active" id="tb-events" onclick="switchTab('events')">Events</button>
-      <button class="tab-btn" id="tb-tasks" onclick="switchTab('tasks')">Tasks</button>
+      <button class="tab-btn" id="tb-tasks" onclick="switchTab('tasks')">Opportunities</button>
       <button class="tab-btn" id="tb-followers" onclick="switchTab('followers')">Followers</button>
       <button class="tab-btn" id="tb-leads" onclick="switchTab('leads')">Leads</button>
     </nav>
@@ -2614,30 +2652,12 @@
     </div>
 
     <div id="sim-content" hidden>
-      <div class="sim-add-form" id="sim-add-form">
-        <div class="sim-add-top">
-          <input type="text" id="sim-title" class="sim-title-input"
-                 placeholder="Task name…" maxlength="200"
-                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addSimTask()}">
-          <button class="add-btn" onclick="addSimTask()">Add</button>
-        </div>
-        <div class="sim-add-fields">
-          <div class="sim-cat-row" id="sim-new-cat-row">
-            <!-- populated by renderSimCatRow() -->
-          </div>
-          <div class="sim-date-row" id="sim-new-date-row" style="position:relative">
-            <!-- populated by renderSimNewDateRow() -->
-          </div>
-          <textarea id="sim-desc-input" class="sim-desc-textarea"
-                    placeholder="Description (optional)…" rows="2"></textarea>
-          <div id="sim-new-atts" class="task-atts"></div>
-          <button class="due-add-btn" onclick="pickFiles('simnew','')" title="Attach file">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-            Attach
-          </button>
-        </div>
+      <div class="opp-add-bar">
+        <input type="text" id="opp-title-input" class="sim-title-input" placeholder="New opportunity…" maxlength="200"
+               onkeydown="if(event.key==='Enter'){event.preventDefault();addOpportunity()}">
+        <button class="add-btn" onclick="addOpportunity()">Add</button>
       </div>
-      <div id="sim-list" class="sim-list"></div>
+      <div id="opp-list"></div>
     </div>
 
     <div id="follow-content" hidden>
@@ -2873,6 +2893,24 @@
     'Exhibitions':  ['#fce7f3', '#9d174d'],
   };
 
+  // ── Opportunities ────────────────────────────────────
+  const OPP_STATUSES = {
+    active:    { label: 'Active',     bg: '#dbeafe', color: '#1d4ed8', border: '#93c5fd' },
+    on_hold:   { label: 'On Hold',    bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+    completed: { label: 'Completed',  bg: '#dcfce7', color: '#15803d', border: '#86efac' },
+    cancelled: { label: 'Cancelled',  bg: '#f1f5f9', color: '#64748b', border: '#cbd5e1' },
+  };
+  const TASK_STATUSES_OPP = {
+    todo:        { label: 'To Do',       bg: '#f1f5f9', color: '#475569', border: '#cbd5e1' },
+    in_progress: { label: 'In Progress', bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+    blocked:     { label: 'Blocked',     bg: '#fee2e2', color: '#b91c1c', border: '#fca5a5' },
+    done:        { label: 'Done',        bg: '#dcfce7', color: '#15803d', border: '#86efac' },
+  };
+
+  let opportunities = [];
+  let openOpps  = new Set();
+  let openTasks = new Set();
+
   const CLIP_SVG = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>`;
 
   function genId() {
@@ -2949,6 +2987,12 @@
   function save() {
     localStorage.setItem('tt_v1', JSON.stringify(tasks));
     _fbSchedulePush();
+  }
+
+  function saveOpportunities() { localStorage.setItem('tt_opps_v1', JSON.stringify(opportunities)); _fbSchedulePush(); }
+  function loadOpportunities() {
+    try { opportunities = JSON.parse(localStorage.getItem('tt_opps_v1') || '[]'); }
+    catch { opportunities = []; }
   }
 
   function saveSimTasks() { localStorage.setItem('tt_tasks_v1', JSON.stringify(simTasks)); _fbSchedulePush(); }
@@ -3750,6 +3794,220 @@
     renderLeads();
   }
 
+  // ── Opportunities ────────────────────────────────────
+
+  function renderOpportunities() {
+    const el = document.getElementById('opp-list');
+    if (!el) return;
+    if (!opportunities.length) {
+      el.innerHTML = '<div class="opp-empty">No opportunities yet — add one above.</div>';
+      return;
+    }
+    el.innerHTML = opportunities.map(oppCardHTML).join('');
+  }
+
+  function _oppStatusSelect(key, statuses, id, fnName) {
+    const st = statuses[key] || Object.values(statuses)[0];
+    return `<select class="opp-status-select" style="background:${st.bg};color:${st.color};border-color:${st.border}"
+      onchange="${fnName}(${id},this.value)" onclick="event.stopPropagation()">
+      ${Object.entries(statuses).map(([k,v])=>`<option value="${k}"${k===key?' selected':''}>${v.label}</option>`).join('')}
+    </select>`;
+  }
+
+  function oppCardHTML(opp) {
+    const isOpen  = openOpps.has(opp.id);
+    const tasks   = opp.tasks || [];
+    const total   = tasks.length;
+    const done    = tasks.filter(t => t.status === 'done').length;
+    const st      = OPP_STATUSES[opp.status || 'active'] || OPP_STATUSES.active;
+    const statusSel = `<select class="opp-status-select"
+      style="background:${st.bg};color:${st.color};border-color:${st.border}"
+      onchange="setOppStatus('${opp.id}',this.value)" onclick="event.stopPropagation()">
+      ${Object.entries(OPP_STATUSES).map(([k,v])=>`<option value="${k}"${k===(opp.status||'active')?' selected':''}>${v.label}</option>`).join('')}
+    </select>`;
+    const progress = total > 0
+      ? `<div class="opp-progress-wrap">
+           <div class="opp-progress-bar"><div class="opp-progress-fill" style="width:${Math.round(done/total*100)}%"></div></div>
+           <span class="opp-progress-text">${done}/${total}</span>
+         </div>` : '';
+    const body = isOpen ? `<div class="opp-body">
+      ${tasks.map(t => oppTaskHTML(opp.id, t)).join('')}
+      <div class="opp-add-task-row">
+        <input class="lead-field-input" id="task-inp-${opp.id}" placeholder="Add task…" maxlength="200"
+               onkeydown="if(event.key==='Enter')addOppTask('${opp.id}')">
+        <button class="add-btn" onclick="addOppTask('${opp.id}')">+</button>
+      </div>
+    </div>` : '';
+    return `<div class="opp-card" id="opp-card-${opp.id}">
+      <div class="opp-header" onclick="toggleOpp('${opp.id}')">
+        <div class="opp-header-left" onclick="event.stopPropagation()">
+          ${statusSel}
+          <input class="opp-title-input" value="${esc(opp.title)}" maxlength="200"
+                 onblur="saveOppField('${opp.id}','title',this.value)"
+                 onkeydown="if(event.key==='Enter')this.blur()"
+                 onclick="event.stopPropagation()">
+        </div>
+        <div class="opp-header-right">
+          ${progress}
+          <button class="opp-icon-btn" onclick="event.stopPropagation();deleteOpp('${opp.id}')" title="Delete">×</button>
+          <span class="opp-chevron">${isOpen ? '▲' : '▼'}</span>
+        </div>
+      </div>
+      ${body}
+    </div>`;
+  }
+
+  function oppTaskHTML(oppId, task) {
+    const isOpen = openTasks.has(task.id);
+    const st = TASK_STATUSES_OPP[task.status || 'todo'] || TASK_STATUSES_OPP.todo;
+    const subs = task.subtasks || [];
+    const doneSubs = subs.filter(s => s.status === 'done').length;
+    const statusSel = `<select class="task-status-select"
+      style="background:${st.bg};color:${st.color};border-color:${st.border}"
+      onchange="setOppTaskStatus('${oppId}','${task.id}',this.value)" onclick="event.stopPropagation()">
+      ${Object.entries(TASK_STATUSES_OPP).map(([k,v])=>`<option value="${k}"${k===(task.status||'todo')?' selected':''}>${v.label}</option>`).join('')}
+    </select>`;
+    const subCount = subs.length ? `<span class="task-sub-count">${doneSubs}/${subs.length}</span>` : '';
+    const body = isOpen ? `<div class="task-subtask-list">
+      ${subs.map(s => oppSubtaskHTML(oppId, task.id, s)).join('')}
+      <div class="opp-add-subtask-row">
+        <input class="lead-field-input" id="stask-inp-${task.id}" placeholder="Add subtask…" maxlength="200"
+               onkeydown="if(event.key==='Enter')addOppSubTask('${oppId}','${task.id}')">
+        <button class="add-btn" onclick="addOppSubTask('${oppId}','${task.id}')">+</button>
+      </div>
+    </div>` : '';
+    return `<div class="opp-task-item" id="task-item-${task.id}">
+      <div class="opp-task-header" onclick="toggleOppTask('${task.id}')">
+        <div class="opp-task-header-left" onclick="event.stopPropagation()">
+          ${statusSel}
+          <input class="task-title-input" value="${esc(task.title)}" maxlength="200"
+                 onblur="saveOppTaskField('${oppId}','${task.id}','title',this.value)"
+                 onkeydown="if(event.key==='Enter')this.blur()"
+                 onclick="event.stopPropagation()">
+        </div>
+        <div class="opp-task-header-right">
+          ${subCount}
+          <button class="opp-icon-btn" onclick="event.stopPropagation();deleteOppTask('${oppId}','${task.id}')" title="Delete">×</button>
+          ${subs.length || isOpen ? `<span class="opp-chevron">${isOpen ? '▲' : '▼'}</span>` : ''}
+        </div>
+      </div>
+      ${body}
+    </div>`;
+  }
+
+  function oppSubtaskHTML(oppId, taskId, sub) {
+    const st = TASK_STATUSES_OPP[sub.status || 'todo'] || TASK_STATUSES_OPP.todo;
+    const statusSel = `<select class="subtask-status-select"
+      style="background:${st.bg};color:${st.color};border-color:${st.border}"
+      onchange="setOppSubTaskStatus('${oppId}','${taskId}','${sub.id}',this.value)">
+      ${Object.entries(TASK_STATUSES_OPP).map(([k,v])=>`<option value="${k}"${k===(sub.status||'todo')?' selected':''}>${v.label}</option>`).join('')}
+    </select>`;
+    return `<div class="opp-subtask-item">
+      ${statusSel}
+      <input class="subtask-title-input" value="${esc(sub.title)}" maxlength="200"
+             onblur="saveOppSubTaskField('${oppId}','${taskId}','${sub.id}','title',this.value)"
+             onkeydown="if(event.key==='Enter')this.blur()">
+      <button class="opp-icon-btn" onclick="deleteOppSubTask('${oppId}','${taskId}','${sub.id}')" title="Delete">×</button>
+    </div>`;
+  }
+
+  // Opportunity CRUD
+  function addOpportunity() {
+    const inp = document.getElementById('opp-title-input');
+    const title = inp.value.trim();
+    if (!title) { inp.focus(); return; }
+    const opp = { id:'op'+Date.now()+Math.random().toString(36).slice(2,5), title, status:'active', tasks:[], createdAt:new Date().toISOString() };
+    opportunities.unshift(opp);
+    openOpps.add(opp.id);
+    inp.value = '';
+    saveOpportunities();
+    renderOpportunities();
+    setTimeout(() => document.getElementById('task-inp-'+opp.id)?.focus(), 50);
+  }
+  function toggleOpp(id) { openOpps.has(id) ? openOpps.delete(id) : openOpps.add(id); renderOpportunities(); }
+  function deleteOpp(id) {
+    if (!confirm('Delete this opportunity and all its tasks?')) return;
+    opportunities = opportunities.filter(o => o.id !== id);
+    openOpps.delete(id);
+    saveOpportunities(); renderOpportunities();
+  }
+  function setOppStatus(id, status) {
+    const o = opportunities.find(o => o.id === id);
+    if (o) { o.status = status; saveOpportunities(); renderOpportunities(); }
+  }
+  function saveOppField(id, field, value) {
+    const o = opportunities.find(o => o.id === id);
+    if (!o) return;
+    const v = value.trim();
+    if (field === 'title' && v) o.title = v;
+    saveOpportunities();
+  }
+
+  // Task CRUD
+  function addOppTask(oppId) {
+    const inp = document.getElementById('task-inp-'+oppId);
+    if (!inp) return;
+    const title = inp.value.trim();
+    if (!title) { inp.focus(); return; }
+    const opp = opportunities.find(o => o.id === oppId);
+    if (!opp) return;
+    const task = { id:'tk'+Date.now()+Math.random().toString(36).slice(2,5), title, status:'todo', subtasks:[] };
+    opp.tasks.push(task);
+    openTasks.add(task.id);
+    inp.value = '';
+    saveOpportunities(); renderOpportunities();
+    setTimeout(() => document.getElementById('stask-inp-'+task.id)?.focus(), 50);
+  }
+  function toggleOppTask(taskId) { openTasks.has(taskId) ? openTasks.delete(taskId) : openTasks.add(taskId); renderOpportunities(); }
+  function deleteOppTask(oppId, taskId) {
+    const opp = opportunities.find(o => o.id === oppId);
+    if (!opp) return;
+    opp.tasks = opp.tasks.filter(t => t.id !== taskId);
+    openTasks.delete(taskId);
+    saveOpportunities(); renderOpportunities();
+  }
+  function setOppTaskStatus(oppId, taskId, status) {
+    const task = opportunities.find(o=>o.id===oppId)?.tasks?.find(t=>t.id===taskId);
+    if (task) { task.status = status; saveOpportunities(); renderOpportunities(); }
+  }
+  function saveOppTaskField(oppId, taskId, field, value) {
+    const task = opportunities.find(o=>o.id===oppId)?.tasks?.find(t=>t.id===taskId);
+    if (!task) return;
+    const v = value.trim();
+    if (field === 'title' && v) task.title = v;
+    saveOpportunities();
+  }
+
+  // SubTask CRUD
+  function addOppSubTask(oppId, taskId) {
+    const inp = document.getElementById('stask-inp-'+taskId);
+    if (!inp) return;
+    const title = inp.value.trim();
+    if (!title) { inp.focus(); return; }
+    const task = opportunities.find(o=>o.id===oppId)?.tasks?.find(t=>t.id===taskId);
+    if (!task) return;
+    task.subtasks.push({ id:'st'+Date.now()+Math.random().toString(36).slice(2,5), title, status:'todo' });
+    inp.value = '';
+    saveOpportunities(); renderOpportunities();
+  }
+  function deleteOppSubTask(oppId, taskId, subId) {
+    const task = opportunities.find(o=>o.id===oppId)?.tasks?.find(t=>t.id===taskId);
+    if (!task) return;
+    task.subtasks = task.subtasks.filter(s=>s.id!==subId);
+    saveOpportunities(); renderOpportunities();
+  }
+  function setOppSubTaskStatus(oppId, taskId, subId, status) {
+    const sub = opportunities.find(o=>o.id===oppId)?.tasks?.find(t=>t.id===taskId)?.subtasks?.find(s=>s.id===subId);
+    if (sub) { sub.status = status; saveOpportunities(); renderOpportunities(); }
+  }
+  function saveOppSubTaskField(oppId, taskId, subId, field, value) {
+    const sub = opportunities.find(o=>o.id===oppId)?.tasks?.find(t=>t.id===taskId)?.subtasks?.find(s=>s.id===subId);
+    if (!sub) return;
+    const v = value.trim();
+    if (field === 'title' && v) sub.title = v;
+    saveOpportunities();
+  }
+
   function renderLeads() {
     const el = document.getElementById('leads-list');
     if (!el) return;
@@ -4156,14 +4414,16 @@
         const remote = snap.data();
         if (remote.deviceId === _FB_DEVICE_ID) return;
         _fbSyncing = true;
-        tasks     = remote.tasks     || [];
-        simTasks  = remote.simTasks  || [];
-        followers = remote.followers || [];
-        leads     = remote.leads     || [];
+        tasks         = remote.tasks         || [];
+        simTasks      = remote.simTasks      || [];
+        followers     = remote.followers     || [];
+        leads         = remote.leads         || [];
+        opportunities = remote.opportunities || [];
         localStorage.setItem('tt_v1',           JSON.stringify(tasks));
         localStorage.setItem('tt_tasks_v1',     JSON.stringify(simTasks));
         localStorage.setItem('tt_followers_v1', JSON.stringify(followers));
         localStorage.setItem('tt_leads_v1',     JSON.stringify(leads));
+        localStorage.setItem('tt_opps_v1',      JSON.stringify(opportunities));
         _fbSyncing = false;
         render();
       },
@@ -4171,7 +4431,7 @@
     );
 
     // Only push on connect if we actually have local data — avoid overwriting Firestore with empty arrays
-    if (tasks.length || simTasks.length || followers.length || leads.length) {
+    if (tasks.length || simTasks.length || followers.length || leads.length || opportunities.length) {
       _fbPushNow().catch(e => setSyncStatus('Sync error: ' + e.message + ' — check Firestore is enabled in test mode.', 'err'));
     }
   }
@@ -4180,7 +4440,7 @@
     if (!_fb.db || _fbSyncing) return;
     try {
       await _fb.db.doc('tt/state').set({
-        tasks, simTasks, followers, leads,
+        tasks, simTasks, followers, leads, opportunities,
         deviceId: _FB_DEVICE_ID,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
@@ -5502,10 +5762,9 @@
       document.getElementById('date-filter-bar').hidden = true;
       document.getElementById('tag-filter-bar').hidden  = true;
       document.getElementById('cat-filter-bar').hidden  = true;
-      document.getElementById('sim-status-bar').hidden  = false;
-      renderSimTasks();
-      renderSimStatusCounts();
-      renderSimCatFilter();
+      document.getElementById('sim-status-bar').hidden  = true;
+      document.getElementById('sim-cat-bar').hidden     = true;
+      renderOpportunities();
     } else if (isCal) {
       document.getElementById('ev-view-bar').hidden     = false;
       document.getElementById('date-filter-bar').hidden = true;
@@ -6689,9 +6948,9 @@
     } else if (isFol) {
       renderFollowers();
     } else if (isTsk) {
-      renderDateFilters();
-      renderSimTasks();
-      renderSimStatusCounts(); renderSimCatFilter();
+      document.getElementById('sim-status-bar').hidden = true;
+      document.getElementById('sim-cat-bar').hidden    = true;
+      renderOpportunities();
     } else {
       renderDateFilters();
       renderTagFilters();
@@ -7161,6 +7420,7 @@
     loadSimTasks();
     loadFollowers();
     loadLeads();
+    loadOpportunities();
     const _now = new Date();
     calYear  = _now.getFullYear();
     calMonth = _now.getMonth();
