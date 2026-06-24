@@ -183,6 +183,38 @@
     .fb-pill.connecting  { background:rgba(245,158,11,0.18); color:#f59e0b; border-color:rgba(245,158,11,0.35); animation:fb-pulse 1.2s ease-in-out infinite; }
     .fb-pill.offline     { background:rgba(239,68,68,0.18);  color:#ef4444; border-color:rgba(239,68,68,0.35); }
     .fb-pill-dot { width:5px; height:5px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+    /* Offline lock — disable all write actions when Firebase is disconnected */
+    .offline-banner { position:fixed; top:0; left:0; right:0; z-index:9999; background:#ef4444; color:#fff; font-size:0.8rem; font-weight:600; text-align:center; padding:0.4rem 1rem; letter-spacing:0.02em; display:none; pointer-events:none; }
+    body.fb-offline .offline-banner { display:block; }
+    body.fb-offline .add-btn,
+    body.fb-offline .del-btn,
+    body.fb-offline .check-btn,
+    body.fb-offline .tile-check,
+    body.fb-offline .follow-tile-del,
+    body.fb-offline .lead-fu-del,
+    body.fb-offline .lead-action-btn,
+    body.fb-offline .lead-add-toggle-btn,
+    body.fb-offline .lead-card-thumb-remove,
+    body.fb-offline .opp-icon-btn,
+    body.fb-offline .tag-remove,
+    body.fb-offline .att-del,
+    body.fb-offline .comment-btn,
+    body.fb-offline .comment-save-btn,
+    body.fb-offline .dep-slip-del,
+    body.fb-offline .due-add-btn,
+    body.fb-offline .sim-expand-btn,
+    body.fb-offline button[onclick*="addOpp"],
+    body.fb-offline button[onclick*="addFollower"],
+    body.fb-offline button[onclick*="saveFollowUp"],
+    body.fb-offline button[onclick*="saveSimEdit"],
+    body.fb-offline button[onclick*="toggleDone"],
+    body.fb-offline button[onclick*="toggleSimDone"],
+    body.fb-offline button[onclick*="removeDepositSlip"],
+    body.fb-offline [contenteditable="true"] { opacity:0.38; pointer-events:none !important; cursor:not-allowed; }
+    body.fb-offline .status-chip { pointer-events:none !important; opacity:0.38; }
+    body.fb-offline input:not([type="file"]):not([type="range"]):not(#fb-config-input),
+    body.fb-offline textarea:not(.fb-config-input) { pointer-events:none !important; opacity:0.38; background:var(--bg) !important; }
     .fb-status-label { font-size: 0.82rem; font-weight: 600; color: var(--text); flex: 1; }
     .fb-config-input {
       width: 100%; box-sizing: border-box; margin-top: 0.75rem;
@@ -2543,6 +2575,8 @@
 </head>
 <body>
 
+<div class="offline-banner" id="offline-banner" aria-live="polite">You're offline — reconnect Firebase to make changes</div>
+
 <header class="header">
   <div class="header-inner">
     <div class="header-top">
@@ -2980,6 +3014,7 @@
     return id;
   })();
   let _fb = { app: null, db: null, storage: null, unsub: null, ops: null };
+  let _fbOnline   = false;
   let _fbSyncing  = false;
   let _fbPushTimer = null;
   let editingAmounts    = new Set();
@@ -4551,6 +4586,8 @@
     const input      = document.getElementById('fb-config-input');
     const pill       = document.getElementById('fb-pill');
     const pillLabel  = document.getElementById('fb-pill-label');
+    _fbOnline = connected;
+    document.body.classList.toggle('fb-offline', !connected);
     if (connected) {
       if (dot)       { dot.className = 'fb-dot on'; }
       if (label)     { label.textContent = 'Connected — syncing in real time'; }
@@ -7471,6 +7508,7 @@
     });
 
     document.getElementById('task-rte-bar').innerHTML = RTE_BAR_INNER;
+    document.body.classList.add('fb-offline'); // locked until Firebase connects
     getDB(); // warm up IndexedDB on load
     const _storedFbCfg = localStorage.getItem('_fbConfig');
     if (_storedFbCfg) {
