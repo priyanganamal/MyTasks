@@ -2573,6 +2573,11 @@
     .opp-icon-btn { background:none; border:none; color:var(--muted); font-size:0.95rem; cursor:pointer; padding:0 0.15rem; line-height:1; }
     .opp-icon-btn:hover { color:#ef4444; }
     .opp-chevron { font-size:0.7rem; color:var(--muted); }
+    .opp-task-due { font-size:0.68rem; color:var(--muted); border:none; background:transparent; font-family:inherit; cursor:pointer; padding:0; outline:none; }
+    .opp-task-due:hover { color:var(--navy); }
+    .opp-task-due.overdue { color:var(--danger); font-weight:600; }
+    .opp-task-due-wrap { display:flex; align-items:center; gap:0.2rem; flex-shrink:0; }
+    .opp-task-due-input { position:absolute; opacity:0; pointer-events:none; width:0; height:0; }
     .opp-body { border-top:1px solid var(--border); padding:0.6rem 0.85rem 0.75rem; }
     .opp-add-task-row,.opp-add-subtask-row { display:flex; gap:0.4rem; margin-top:0.5rem; align-items:center; }
     .opp-add-task-row .add-btn,.opp-add-subtask-row .add-btn { padding:0.3rem 0.65rem; font-size:0.8rem; flex-shrink:0; }
@@ -3904,6 +3909,19 @@
       ${Object.entries(TASK_STATUSES_OPP).map(([k,v])=>`<option value="${k}"${k===(task.status||'todo')?' selected':''}>${v.label}</option>`).join('')}
     </select>`;
     const subCount = subs.length ? `<span class="task-sub-count">${doneSubs}/${subs.length}</span>` : '';
+
+    const today = todayStr();
+    const due = task.dueDate || '';
+    const isOverdueDue = due && due < today && task.status !== 'done';
+    const dueLabel = due ? fmtOppDate(due) : '+ Date';
+    const dueClass = isOverdueDue ? 'overdue' : '';
+    const duePart = `<div class="opp-task-due-wrap" onclick="event.stopPropagation()">
+      <button class="opp-task-due ${dueClass}" onclick="document.getElementById('due-inp-${task.id}').showPicker?document.getElementById('due-inp-${task.id}').showPicker():document.getElementById('due-inp-${task.id}').click()" title="${due ? 'Change date' : 'Set due date'}">📅 ${dueLabel}</button>
+      <input type="date" id="due-inp-${task.id}" class="opp-task-due-input" value="${due}"
+             onchange="saveOppTaskDue('${oppId}','${task.id}',this.value)">
+      ${due ? `<button class="opp-icon-btn" onclick="event.stopPropagation();saveOppTaskDue('${oppId}','${task.id}','')" title="Clear date" style="font-size:0.7rem">×</button>` : ''}
+    </div>`;
+
     const body = isOpen ? `<div class="task-subtask-list">
       ${subs.map(s => oppSubtaskHTML(oppId, task.id, s)).join('')}
       <div class="opp-add-subtask-row">
@@ -3922,6 +3940,7 @@
                  onclick="event.stopPropagation()">
         </div>
         <div class="opp-task-header-right">
+          ${duePart}
           ${subCount}
           <button class="opp-icon-btn" onclick="event.stopPropagation();deleteOppTask('${oppId}','${task.id}')" title="Delete">×</button>
           ${subs.length || isOpen ? `<span class="opp-chevron">${isOpen ? '▲' : '▼'}</span>` : ''}
@@ -3929,6 +3948,20 @@
       </div>
       ${body}
     </div>`;
+  }
+
+  function fmtOppDate(d) {
+    if (!d) return '';
+    const [y, m, day] = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return `${months[+m-1]} ${+day}`;
+  }
+
+  function saveOppTaskDue(oppId, taskId, value) {
+    const task = opportunities.find(o => o.id === oppId)?.tasks?.find(t => t.id === taskId);
+    if (!task) return;
+    task.dueDate = value || null;
+    saveOpportunities(); renderOpportunities();
   }
 
   function oppSubtaskHTML(oppId, taskId, sub) {
@@ -7572,6 +7605,15 @@
       for (const fu of (l.followUps || [])) {
         if (fu.nextFollowUp) {
           add(fu.nextFollowUp, { label: `${l.name}: ${fu.notes || 'Follow-up'}`, src: 'src-lead', id: l.id, tab: 'leads' });
+        }
+      }
+    }
+
+    // Opportunity tasks — due dates
+    for (const opp of opportunities) {
+      for (const t of (opp.tasks || [])) {
+        if (t.dueDate) {
+          add(t.dueDate, { label: `${opp.title}: ${t.title}`, src: 'src-sim', id: opp.id, tab: 'tasks' });
         }
       }
     }
